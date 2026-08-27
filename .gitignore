@@ -1,0 +1,11 @@
+/public/
+/bin/
+/themes/zola.386/
+.DS_Store
+*.tmp
+
+# Runme
+.env
+.env.local
+.env.*.local
+.direnv/

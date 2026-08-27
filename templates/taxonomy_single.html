@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}{{ term.name }} · {{ config.title }}{% endblock title %}
+{% block content %}
+<header class="ops-page-header"><p class="ops-eyebrow">{{ taxonomy.name }}</p><h1>{{ term.name }}</h1><p>{{ term.page_count }} páginas</p></header>
+<div class="ops-list">{% for page in term.pages %}<article class="ops-list-item"><div class="ops-list-item__meta"><code>{{ page.extra.id }}</code><span>{{ page.date }}</span></div><h2><a href="{{ page.permalink }}">{{ page.title }}</a></h2><p>{{ page.description }}</p></article>{% endfor %}</div>
+{% endblock content %}

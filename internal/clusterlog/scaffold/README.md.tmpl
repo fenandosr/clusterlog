@@ -1,0 +1,51 @@
+# {{TITLE}}
+
+Este repositorio es una **instancia de clusterlog**: contiene el contenido,
+los datos y la configuración de un deployment concreto, no el código del
+motor. Se generó con:
+
+```bash
+clusterlog bootstrap-instance --output . --product-name "{{PRODUCT_NAME}}"
+```
+
+## Qué hay aquí
+
+- `content/` — documentación, manuales, memorias, proyectos y tareas de esta
+  instancia. Empieza con las seis secciones vacías (`_index.md` únicamente).
+- `data/admins.json`, `config/allowed_signers` — registro de administradores,
+  vacío hasta el primer `admin add`.
+- `zola.toml` — configuración de este deployment (`base_url`, nombre del
+  producto). Cámbiela antes de publicar.
+- `.clusterlog-version` — versión del motor `clusterlog` usada para generar
+  este esqueleto. Manténgala sincronizada con el binario que use su CI.
+
+## Primeros pasos
+
+1. Cambie `base_url` en `zola.toml` por el dominio real de este deployment.
+2. Registre al primer administrador (recibe `owner` automáticamente):
+
+   ```bash
+   clusterlog --root . --ssh-key ~/.ssh/id_ed25519.pub admin add \
+     --id ana --name "Ana Torres" --email ana@example.org \
+     --key ~/.ssh/id_ed25519.pub --roles owner,admin
+   ```
+
+3. Inicialice Git y firme el primer commit (vea la sección "Registrar al
+   primer administrador" en la documentación del motor para el detalle
+   completo de `git config`/`commit -S`).
+4. Genere la proyección y valide:
+
+   ```bash
+   clusterlog --root . sync
+   clusterlog --root . validate --skip-zola
+   ```
+
+## Pendiente (no incluido por este comando)
+
+- Plantillas Tera y el tema `zola.386`: todavía se obtienen desde un checkout
+  del repositorio del motor (`make theme` / `scripts/bootstrap-theme.sh`).
+  Empaquetarlos en un release descargable del motor es trabajo de una fase
+  posterior.
+- Un workflow de CI para esta instancia (que descargue el binario del motor
+  por versión fijada) no se generó todavía: el motor aún no publica releases
+  binarios. Se agrega en cuanto exista ese release.

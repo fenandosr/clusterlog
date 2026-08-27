@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}404 · {{ config.title }}{% endblock title %}
+{% block content %}<section class="ops-hero"><p class="ops-eyebrow">ERROR 404</p><h1>Ruta no encontrada</h1><p>La referencia no existe en la proyección actual de la bitácora.</p><p><a href="{{ get_url(path='@/_index.md') }}">Volver al inicio</a></p></section>{% endblock content %}

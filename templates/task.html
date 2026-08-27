@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+{% block content %}
+<article class="ops-article">
+<header class="ops-page-header"><p class="ops-eyebrow"><code>{{ page.extra.id }}</code> / TAREA</p><h1>{{ page.title }}</h1><p>{{ page.description }}</p>
+<div class="ops-meta"><span>Estado base: {{ page.extra.status }}</span><span>Prioridad: {{ page.extra.priority }}</span><span>Estimación: {{ page.extra.estimate_minutes }} min</span>{% if page.extra.due %}<span>Fecha: {{ page.extra.due }}</span>{% endif %}{% if page.extra.project_id %}<span>Proyecto: {{ page.extra.project_id }}</span>{% endif %}</div></header>
+<aside class="ops-callout">El estado efectivo y el tiempo acumulado se muestran en el <a href="{{ get_url(path='@/tareas/_index.md') }}">tablero de tareas</a>; se calculan desde el registro de eventos.</aside>
+<div class="ops-prose">{{ page.content | safe }}</div>
+<pre><code>clusterlog --commit task start {{ page.extra.id }}
+clusterlog --commit task stop {{ page.extra.id }}
+clusterlog --commit task done {{ page.extra.id }}</code></pre>
+</article>
+{% endblock content %}

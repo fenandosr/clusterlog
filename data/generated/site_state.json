@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "generated_at": "2026-08-27T06:15:19Z",
+  "source_sha256": "e524270e31020742d2e84b4ced898de2bd5b1370a2023feb2bd85b541c20cdfe",
+  "stats": {
+    "active_admins": 0,
+    "pending_reviews": 0,
+    "open_tasks": 0,
+    "active_projects": 0
+  },
+  "review_queue": [],
+  "recent_memories": [],
+  "tasks": [],
+  "projects": []
+}

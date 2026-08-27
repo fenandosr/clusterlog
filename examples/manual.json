@@ -1,0 +1,9 @@
+{
+  "section": "manuales",
+  "title": "Reemplazo seguro de un nodo de cómputo",
+  "description": "Runbook para drenar, reemplazar y reincorporar un nodo",
+  "tags": ["runbook", "hardware"],
+  "systems": ["compute", "kubernetes"],
+  "weight": 20,
+  "body_markdown": "## Prerrequisitos\n\n- Ventana aprobada.\n- Capacidad suficiente en los nodos restantes.\n- Acceso fuera de banda probado.\n\n## Procedimiento\n\n1. Confirmar salud del clúster.\n2. Drenar el nodo según la política de cargas.\n3. Verificar reubicación.\n4. Reemplazar el equipo.\n5. Reincorporar y validar.\n\n## Reversión\n\nRehabilitar el nodo anterior únicamente cuando sea seguro y documentar cualquier desviación.\n"
+}

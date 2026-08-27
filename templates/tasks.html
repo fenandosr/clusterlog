@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ section.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description }}{% endblock description %}
+{% block content %}
+<header class="ops-page-header"><p class="ops-eyebrow">TRABAJO COMPARTIDO</p><h1>{{ section.title }}</h1><p>{{ section.description }}</p><div class="ops-prose">{{ section.content | safe }}</div></header>
+<div class="ops-board">
+{% for task in ops.tasks %}
+  <article class="ops-card">
+    <div class="ops-card__top"><code>{{ task.task_id }}</code><span class="badge badge--status">{{ task.status }}</span></div>
+    <h2><a href="{{ task.permalink }}">{{ task.title }}</a></h2><p>{{ task.description }}</p>
+    <dl><dt>Prioridad</dt><dd>{{ task.priority }}</dd><dt>Estimado</dt><dd>{{ task.estimate_minutes }} min</dd><dt>Real</dt><dd>{{ task.actual_minutes }} min</dd>{% if task.due %}<dt>Fecha</dt><dd>{{ task.due }}</dd>{% endif %}{% if task.project_id %}<dt>Proyecto</dt><dd>{{ task.project_id }}</dd>{% endif %}</dl>
+    {% if task.running_by | length > 0 %}<p class="ops-running">▶ En curso por {% for admin in task.running_by %}{{ admin }}{% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+    <div class="ops-tags">{% for admin in task.assignees %}<span>+{{ admin }}</span>{% endfor %}</div>
+  </article>
+{% endfor %}
+{% if ops.tasks | length == 0 %}<p class="ops-empty">No hay tareas.</p>{% endif %}
+</div>
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ section.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description }}{% endblock description %}
+{% block content %}
+<header class="ops-page-header"><p class="ops-eyebrow">LÍNEAS DE TRABAJO</p><h1>{{ section.title }}</h1><p>{{ section.description }}</p><div class="ops-prose">{{ section.content | safe }}</div></header>
+<div class="ops-board">
+{% for project in ops.projects %}
+  <article class="ops-card">
+    <div class="ops-card__top"><code>{{ project.project_id }}</code><span class="badge badge--status">{{ project.status }}</span></div>
+    <h2><a href="{{ project.permalink }}">{{ project.title }}</a></h2><p>{{ project.description }}</p>
+    <dl>{% if project.target_date %}<dt>Objetivo</dt><dd>{{ project.target_date }}</dd>{% endif %}<dt>Responsables</dt><dd>{% for owner in project.owners %}{{ owner }}{% if not loop.last %}, {% endif %}{% endfor %}{% if project.owners | length == 0 %}Sin asignar{% endif %}</dd></dl>
+  </article>
+{% endfor %}
+{% if ops.projects | length == 0 %}<p class="ops-empty">No hay proyectos.</p>{% endif %}
+</div>
+{% endblock content %}

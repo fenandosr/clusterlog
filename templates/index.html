@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ section.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description }}{% endblock description %}
+{% block content %}
+<section class="ops-hero">
+  <p class="ops-eyebrow">OPERACIONES / CONOCIMIENTO / AUDITORÍA</p>
+  <h1>{{ section.title }}</h1>
+  <div class="ops-lead">{{ section.content | safe }}</div>
+</section>
+
+<section class="ops-stats" aria-label="Estado actual">
+  <a class="ops-stat" href="{{ get_url(path='@/revision/_index.md') }}"><strong>{{ ops.stats.pending_reviews }}</strong><span>revisiones pendientes</span></a>
+  <a class="ops-stat" href="{{ get_url(path='@/tareas/_index.md') }}"><strong>{{ ops.stats.open_tasks }}</strong><span>tareas abiertas</span></a>
+  <a class="ops-stat" href="{{ get_url(path='@/proyectos/_index.md') }}"><strong>{{ ops.stats.active_projects }}</strong><span>proyectos activos</span></a>
+  <div class="ops-stat"><strong>{{ ops.stats.active_admins }}</strong><span>administradores activos</span></div>
+</section>
+
+<section class="ops-grid ops-grid--sections">
+  <a class="ops-panel" href="{{ get_url(path='@/documentacion/_index.md') }}"><span class="ops-panel__code">DOC</span><h2>Documentación</h2><p>Arquitectura y decisiones duraderas.</p></a>
+  <a class="ops-panel" href="{{ get_url(path='@/manuales/_index.md') }}"><span class="ops-panel__code">RUN</span><h2>Manuales</h2><p>Procedimientos repetibles y reversibles.</p></a>
+  <a class="ops-panel" href="{{ get_url(path='@/memorias/_index.md') }}"><span class="ops-panel__code">MEM</span><h2>Memorias</h2><p>Historia de operaciones y cambios.</p></a>
+  <a class="ops-panel" href="{{ get_url(path='@/proyectos/_index.md') }}"><span class="ops-panel__code">PRJ</span><h2>Proyectos</h2><p>Objetivos, alcance e hitos.</p></a>
+  <a class="ops-panel" href="{{ get_url(path='@/tareas/_index.md') }}"><span class="ops-panel__code">TSK</span><h2>Tareas</h2><p>Trabajo visible y tiempo registrado.</p></a>
+  <a class="ops-panel ops-panel--attention" href="{{ get_url(path='@/revision/_index.md') }}"><span class="ops-panel__code">REV</span><h2>Revisión semanal</h2><p>La agenda común del equipo.</p></a>
+</section>
+
+<section class="ops-section-heading">
+  <div><p class="ops-eyebrow">ACTIVIDAD</p><h2>Memorias recientes</h2></div>
+  <a href="{{ get_url(path='@/memorias/_index.md') }}">Ver todas →</a>
+</section>
+<div class="ops-list">
+  {% for item in ops.recent_memories %}
+    {% if loop.index <= 6 %}
+    <article class="ops-list-item">
+      <div class="ops-list-item__meta"><code>{{ item.entry_id }}</code><span class="badge badge--{{ item.risk }}">{{ item.risk }}</span><span>{{ item.date }}</span></div>
+      <h3><a href="{{ item.permalink }}">{{ item.title }}</a></h3>
+      <p>{{ item.description }}</p>
+      <div class="ops-tags">{% for tag in item.tags %}<span>#{{ tag }}</span>{% endfor %}</div>
+    </article>
+    {% endif %}
+  {% endfor %}
+  {% if ops.recent_memories | length == 0 %}<p class="ops-empty">Todavía no hay memorias operativas.</p>{% endif %}
+</div>
+{% endblock content %}

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "review_policy": {
+    "default": "all-active",
+    "include_author": true
+  },
+  "admins": []
+}

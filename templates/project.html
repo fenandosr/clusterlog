@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+{% block content %}
+<article class="ops-article">
+<header class="ops-page-header"><p class="ops-eyebrow"><code>{{ page.extra.id }}</code> / PROYECTO</p><h1>{{ page.title }}</h1><p>{{ page.description }}</p>
+<div class="ops-meta"><span>Estado: {{ page.extra.status }}</span>{% if page.extra.target_date %}<span>Fecha objetivo: {{ page.extra.target_date }}</span>{% endif %}<span>Responsables: {% for owner in page.extra.owners %}{{ owner }}{% if not loop.last %}, {% endif %}{% endfor %}{% if page.extra.owners | length == 0 %}Sin asignar{% endif %}</span></div></header>
+<div class="ops-prose">{{ page.content | safe }}</div>
+</article>
+{% endblock content %}

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ taxonomy.name }} · {{ config.title }}{% endblock title %}
+{% block content %}
+<header class="ops-page-header"><p class="ops-eyebrow">ÍNDICE</p><h1>{{ taxonomy.name }}</h1></header>
+<div class="ops-grid">
+{% for term in terms %}<a class="ops-panel" href="{{ term.permalink }}"><h2>{{ term.name }}</h2><p>{{ term.page_count }} páginas</p></a>{% endfor %}
+</div>
+{% endblock content %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ section.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description }}{% endblock description %}
+{% block content %}
+<header class="ops-page-header">
+  <p class="ops-eyebrow">HISTORIA TÉCNICA</p><h1>{{ section.title }}</h1><p>{{ section.description }}</p>
+  <div class="ops-prose">{{ section.content | safe }}</div>
+</header>
+<div class="ops-list">
+{% for page in section.pages %}
+  <article class="ops-list-item">
+    <div class="ops-list-item__meta"><code>{{ page.extra.id }}</code><span class="badge badge--{{ page.extra.risk }}">{{ page.extra.risk }}</span><span>{{ page.date }}</span><span>por {{ page.extra.author_id }}</span></div>
+    <h2><a href="{{ page.permalink }}">{{ page.title }}</a></h2>
+    <p>{{ page.description }}</p>
+    <div class="ops-tags">{% for system in page.taxonomies.systems %}<span>@{{ system }}</span>{% endfor %}{% for tag in page.taxonomies.tags %}<span>#{{ tag }}</span>{% endfor %}</div>
+  </article>
+{% endfor %}
+</div>
+{% endblock content %}

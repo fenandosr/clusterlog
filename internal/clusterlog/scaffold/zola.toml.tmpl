@@ -1,0 +1,53 @@
+base_url = "{{BASE_URL}}"
+title = "{{TITLE}}"
+description = "Documentación, manuales, memorias de cambio, proyectos y tareas del equipo de soporte."
+default_language = "es"
+theme = "zola.386"
+output_dir = "public"
+compile_sass = true
+minify_html = true
+generate_feeds = true
+feed_filenames = ["atom.xml", "rss.xml"]
+build_search_index = true
+generate_sitemap = true
+generate_robots_txt = false
+
+taxonomies = [
+  { name = "categories" },
+  { name = "tags", feed = true },
+  { name = "systems" },
+]
+
+[markdown]
+external_links_target_blank = true
+external_links_no_referrer = true
+smart_punctuation = true
+github_alerts = true
+insert_anchor_links = "right"
+
+[markdown.highlighting]
+error_on_missing_language = false
+style = "inline"
+theme = "vitesse-black"
+
+[search]
+include_title = true
+include_description = true
+include_date = true
+include_path = true
+include_content = true
+truncate_content_length = 12000
+index_format = "elasticlunr_json"
+
+[slugify]
+paths = "on"
+taxonomies = "on"
+anchors = "on"
+paths_keep_dates = false
+
+[extra]
+product_name = "{{PRODUCT_NAME}}"
+product_short_name = "clusterlog"
+repository_label = "Repositorio interno"
+review_meeting_label = "Revisión semanal"
+footer_text = "Fuente auditable: Markdown + eventos JSON + Git"

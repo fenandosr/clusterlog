@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ section.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description }}{% endblock description %}
+{% block content %}
+<header class="ops-page-header">
+  <p class="ops-eyebrow">AGENDA DEL EQUIPO</p><h1>{{ section.title }}</h1><p>{{ section.description }}</p>
+  <div class="ops-prose">{{ section.content | safe }}</div>
+</header>
+
+<div class="ops-callout">
+  <strong>Flujo de la reunión:</strong> abrir la memoria, discutirla y registrar cada confirmación con
+  <code>clusterlog --commit review mark &lt;ID&gt;</code>. Una edición posterior cambia el hash y vuelve a abrir la revisión.
+</div>
+
+<section aria-labelledby="review-queue-title">
+  <h2 id="review-queue-title">Memorias pendientes</h2>
+  <div class="ops-list">
+  {% for item in ops.review_queue %}
+    <article class="ops-list-item ops-list-item--review">
+      <div class="ops-list-item__meta"><code>{{ item.entry_id }}</code><span class="badge badge--{{ item.risk }}">{{ item.risk }}</span><span>{{ item.reviewed_count }}/{{ item.required_count }} revisiones</span></div>
+      <h3><a href="{{ item.permalink }}">{{ item.title }}</a></h3>
+      <p>{{ item.description }}</p>
+      {% if item.configuration_error %}<p class="ops-error">{{ item.configuration_error }}</p>{% endif %}
+      <div class="ops-review-grid">
+        <div><strong>Revisaron</strong>{% for admin in item.reviewed_by %}<span class="reviewer reviewer--done">✓ {{ admin }}</span>{% endfor %}{% if item.reviewed_by | length == 0 %}<span class="reviewer">Nadie aún</span>{% endif %}</div>
+        <div><strong>Faltan</strong>{% for admin in item.missing_reviewers %}<span class="reviewer reviewer--missing">○ {{ admin }}</span>{% endfor %}{% if item.missing_reviewers | length == 0 %}<span class="reviewer reviewer--done">Completa</span>{% endif %}</div>
+      </div>
+      <pre><code>clusterlog --json --commit review mark {{ item.entry_id }}</code></pre>
+    </article>
+  {% endfor %}
+  {% if ops.review_queue | length == 0 %}<div class="ops-empty ops-empty--success"><strong>Cola limpia.</strong><br>No hay memorias pendientes para la versión actual de su contenido.</div>{% endif %}
+  </div>
+</section>
+
+<section class="ops-meeting-section" aria-labelledby="meeting-tasks-title">
+  <h2 id="meeting-tasks-title">Tareas abiertas para revisar</h2>
+  <div class="ops-list">
+  {% for task in ops.tasks %}
+    {% if task.status != "done" and task.status != "cancelled" %}
+    <article class="ops-list-item">
+      <div class="ops-list-item__meta"><code>{{ task.task_id }}</code><span class="badge">{{ task.status }}</span><span>{{ task.actual_minutes }}/{{ task.estimate_minutes }} min</span></div>
+      <h3><a href="{{ task.permalink }}">{{ task.title }}</a></h3>
+      <p>{{ task.description }}</p>
+      {% if task.running_by | length > 0 %}<p><strong>En ejecución:</strong> {{ task.running_by | join(sep=", ") }}</p>{% endif %}
+    </article>
+    {% endif %}
+  {% endfor %}
+  </div>
+</section>
+
+<section class="ops-meeting-section" aria-labelledby="meeting-projects-title">
+  <h2 id="meeting-projects-title">Proyectos activos o bloqueados</h2>
+  <div class="ops-list">
+  {% for project in ops.projects %}
+    {% if project.status == "active" or project.status == "blocked" or project.status == "planned" %}
+    <article class="ops-list-item">
+      <div class="ops-list-item__meta"><code>{{ project.project_id }}</code><span class="badge">{{ project.status }}</span>{% if project.target_date %}<span>Meta {{ project.target_date }}</span>{% endif %}</div>
+      <h3><a href="{{ project.permalink }}">{{ project.title }}</a></h3>
+      <p>{{ project.description }}</p>
+    </article>
+    {% endif %}
+  {% endfor %}
+  </div>
+</section>
+{% endblock content %}

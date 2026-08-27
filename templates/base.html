@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+  <link rel="stylesheet" href="{{ get_url(path='site.css') }}">
+  <link rel="stylesheet" href="{{ get_url(path='css/ops.css') }}">
+  <link rel="alternate" type="application/atom+xml" title="Atom" href="{{ get_url(path='atom.xml') }}">
+</head>
+<body>
+{% set ops = load_data(path="data/generated/site_state.json", format="json") %}
+<header class="ops-header">
+  <div class="container ops-header__inner">
+    <a class="ops-brand" href="{{ get_url(path='@/_index.md') }}">{{ config.extra.product_name }}</a>
+    <span class="ops-prompt" aria-hidden="true">root@cluster:~#</span>
+    <nav class="ops-nav" aria-label="Navegación principal">
+      <a href="{{ get_url(path='@/documentacion/_index.md') }}">Documentación</a>
+      <a href="{{ get_url(path='@/manuales/_index.md') }}">Manuales</a>
+      <a href="{{ get_url(path='@/memorias/_index.md') }}">Memorias</a>
+      <a href="{{ get_url(path='@/proyectos/_index.md') }}">Proyectos</a>
+      <a href="{{ get_url(path='@/tareas/_index.md') }}">Tareas</a>
+      <a class="ops-nav__review" href="{{ get_url(path='@/revision/_index.md') }}">Revisión <span>{{ ops.stats.pending_reviews }}</span></a>
+    </nav>
+  </div>
+</header>
+
+<div class="container ops-search" role="search">
+  <label for="ops-search-input">Buscar en la bitácora</label>
+  <div class="ops-search__row">
+    <input id="ops-search-input" type="search" autocomplete="off" data-index-url="{{ get_url(path='search_index.es.json') }}" placeholder="título, sistema, comando, incidente…">
+    <kbd>/</kbd>
+  </div>
+  <div id="ops-search-results" class="ops-search-results" hidden></div>
+</div>
+
+<main class="container ops-main">
+  {% block content %}{% endblock content %}
+</main>
+
+<footer class="container ops-footer">
+  <span>{{ config.extra.footer_text }}</span>
+  <span>CLI: <code>{{ config.extra.product_short_name }}</code></span>
+</footer>
+<script defer src="{{ get_url(path='js/ops-search.js') }}"></script>
+</body>
+</html>

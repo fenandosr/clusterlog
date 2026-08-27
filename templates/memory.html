@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description }}{% endblock description %}
+{% block content %}
+<article class="ops-article">
+  <header class="ops-page-header">
+    <p class="ops-eyebrow"><code>{{ page.extra.id }}</code> / MEMORIA OPERATIVA</p>
+    <h1>{{ page.title }}</h1><p>{{ page.description }}</p>
+    <div class="ops-meta">
+      <span>Autor: <strong>{{ page.extra.author_id }}</strong></span>
+      <span>Fecha: {{ page.date }}</span>
+      <span>Riesgo: <strong class="badge badge--{{ page.extra.risk }}">{{ page.extra.risk }}</strong></span>
+      {% if page.extra.duration_minutes > 0 %}<span>Duración: {{ page.extra.duration_minutes }} min</span>{% endif %}
+      {% if page.extra.ticket %}<span>Referencia: {{ page.extra.ticket }}</span>{% endif %}
+    </div>
+    <div class="ops-tags">{% for system in page.taxonomies.systems %}<span>@{{ system }}</span>{% endfor %}{% for tag in page.taxonomies.tags %}<a href="{{ get_taxonomy_url(kind='tags', name=tag) }}">#{{ tag }}</a>{% endfor %}</div>
+  </header>
+  {% if page.extra.review_required %}
+  <aside class="ops-callout"><strong>Revisión requerida.</strong> El estado se calcula contra el hash actual. Consulte <a href="{{ get_url(path='@/revision/_index.md') }}">Revisión semanal</a>.</aside>
+  {% endif %}
+  <div class="ops-prose">{{ page.content | safe }}</div>
+  <footer class="ops-source"><span>Huella SSH del autor:</span><code>{{ page.extra.author_fingerprint }}</code></footer>
+</article>
+{% endblock content %}

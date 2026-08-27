@@ -1,0 +1,27 @@
+{
+  "title": "Estandarizar observabilidad del clúster",
+  "description": "Unificar métricas, registros, alertas y tableros operativos",
+  "objective": "Lograr cobertura observable y criterios de alerta consistentes para todos los componentes críticos.",
+  "owners": [],
+  "target_date": "2026-12-15",
+  "status": "planned",
+  "tags": ["observabilidad"],
+  "systems": ["prometheus", "loki", "grafana"],
+  "scope": [
+    "Inventario de alertas",
+    "Dashboards base",
+    "Retención y capacidad"
+  ],
+  "out_of_scope": [
+    "Sustituir el sistema corporativo de incidentes"
+  ],
+  "milestones": [
+    "Completar inventario",
+    "Publicar estándares",
+    "Migrar componentes críticos"
+  ],
+  "success_criteria": [
+    "100% de nodos reporta métricas base.",
+    "Todas las alertas críticas tienen owner y runbook."
+  ]
+}

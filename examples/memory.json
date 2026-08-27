@@ -1,0 +1,26 @@
+{
+  "title": "Actualizar firmware del switch spine-01",
+  "description": "Cambio controlado y validación de enlaces del spine principal",
+  "tags": ["red", "firmware"],
+  "systems": ["spine-01"],
+  "risk": "high",
+  "ticket": "CHG-1042",
+  "review_required": true,
+  "review_policy": "all-active-except-author",
+  "context": "La versión instalada contiene una corrección aprobada para pérdida intermitente de telemetría.",
+  "changes": [
+    "Respaldé la configuración vigente.",
+    "Instalé la imagen aprobada y reinicié durante la ventana de mantenimiento."
+  ],
+  "commands": [
+    "show version",
+    "show interfaces status"
+  ],
+  "validation": [
+    "Todos los uplinks quedaron en estado up.",
+    "No aparecieron errores nuevos en los registros durante 20 minutos."
+  ],
+  "rollback": "Arrancar la imagen anterior y restaurar la configuración respaldada.",
+  "duration_minutes": 75,
+  "agent": "claude-code"
+}

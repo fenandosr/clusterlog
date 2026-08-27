@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Instalar Zola fijado
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -sL "https://github.com/getzola/zola/releases/download/v0.23.3/zola-v0.23.3-x86_64-unknown-linux-gnu.tar.gz" -o /tmp/zola.tar.gz
+          tar xz -C "$HOME/.local/bin" -f /tmp/zola.tar.gz zola
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/zola" --version
+
+      - name: Preparar tema fijado
+        run: ./scripts/bootstrap-theme.sh
+
+      - name: Formato Go
+        run: test -z "$(gofmt -l cmd internal)"
+
+      - name: Pruebas Go
+        run: go test ./...
+
+      - name: Detector de carreras Go
+        run: go test -race ./...
+
+      - name: Análisis estático Go
+        run: go vet ./...
+
+      - name: Compilar CLI
+        run: make build
+
+      - name: Flujo integral de la CLI
+        run: ./scripts/e2e-local.sh
+
+      - name: Verificar firmas SSH de commits del pull request
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: ./scripts/verify-signatures-ci.sh
+
+      - name: Regenerar y comprobar proyección
+        run: |
+          ./bin/clusterlog --root . sync
+          ./bin/clusterlog --root . sync --check
+
+      - name: Validar contenido y plantillas
+        run: ./bin/clusterlog --root . validate --require-zola
+
+      - name: Construir y, en main, publicar en producción
+        run: |
+          zola build
+          if [ "${{ github.ref_name }}" = "main" ] && [ "${{ github.event_name }}" = "push" ]; then
+            echo "Publicando en clusterlog.mcps-epcm.org"
+            rsync -a --delete public/ /opt/clusterlog/public/
+          else
+            echo "Rama '${{ github.ref_name }}' (evento '${{ github.event_name }}'): no se publica."
+          fi
+
+      - name: Fin del pipeline
+        run: echo "listo"
+
+  runme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      DO_NOT_TRACK: "true"
+      SCARF_NO_ANALYTICS: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Compilar CLI
+        run: make build
+
+      - name: Instalar Runme fijado (v3.17.4, checksum verificado)
+        run: make runme-install
+
+      - name: Exponer runme en PATH
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Reglas de clusterlog validate sobre los runbooks
+        run: make runme-check
+
+      - name: Ejecutar celdas ci-safe de RUNBOOK.md
+        run: make runme-ci

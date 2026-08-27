@@ -1,0 +1,18 @@
+{
+  "title": "Probar restauración de etcd",
+  "description": "Ejercicio controlado de recuperación del plano de control",
+  "project_id": "",
+  "priority": "high",
+  "assignees": [],
+  "estimate_minutes": 120,
+  "due": "2026-09-15",
+  "tags": ["backup", "dr"],
+  "systems": ["etcd"],
+  "objective": "Validar el RTO y corregir el runbook de restauración.",
+  "acceptance_criteria": [
+    "La restauración termina sin pérdida fuera del punto respaldado.",
+    "El RTO medido es menor a 60 minutos.",
+    "El manual refleja todos los pasos observados."
+  ],
+  "notes": "Ejecutar en un entorno aislado con snapshots aprobados."
+}
