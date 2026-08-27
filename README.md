@@ -57,13 +57,13 @@ El sitio queda disponible en la dirección que muestre Zola. Antes de publicarlo
 
 ## Crear una instancia nueva
 
-Este repositorio hoy mezcla la herramienta con el contenido de un deployment. Para empezar un deployment **distinto** sin partir de este contenido, use:
+Este repositorio es el **motor**: la CLI, las plantillas y el mecanismo de tema, sin contenido de ningún deployment real (`content/`, `data/` y `config/` de este commit son un fixture genérico, ver `docs/adr/0005-motor-instancia.md`). Para dar de alta un deployment nuevo:
 
 ```bash
 clusterlog bootstrap-instance --output ./mi-deploy --product-name "Mi Bitácora"
 ```
 
-Genera `zola.toml`, las seis secciones de `content/` vacías, `data/admins.json`/`config/allowed_signers` vacíos y `.clusterlog-version`. Ver la sección 17 de [`CLI.md`](CLI.md) para el detalle completo; sigue siendo un primer paso — todavía no incluye plantillas/tema empaquetados ni CI de instancia (el motor no publica releases binarios todavía).
+Genera `zola.toml`, las seis secciones de `content/` vacías, `data/admins.json`/`config/allowed_signers` vacíos, `templates/` (embebidas en el binario, sin red) y `.clusterlog-version`. Ver la sección 17 de [`CLI.md`](CLI.md) para el detalle completo; el tema (`zola.386`, dependencia externa) y un `.gitea/workflows/ci.yml` de arranque siguen siendo pasos aparte.
 
 ## Registrar al primer administrador
 

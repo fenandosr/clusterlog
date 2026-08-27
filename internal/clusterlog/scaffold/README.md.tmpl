@@ -18,6 +18,10 @@ clusterlog bootstrap-instance --output . --product-name "{{PRODUCT_NAME}}"
   producto). Cámbiela antes de publicar.
 - `.clusterlog-version` — versión del motor `clusterlog` usada para generar
   este esqueleto. Manténgala sincronizada con el binario que use su CI.
+- `templates/` — plantillas Tera del motor, embebidas en el binario y
+  extraídas por este mismo comando. Si actualiza `.clusterlog-version` más
+  adelante, corra `clusterlog --root . templates extract` con el binario
+  nuevo para refrescarlas (no requiere red: viajan dentro del binario).
 
 ## Primeros pasos
 
@@ -42,10 +46,10 @@ clusterlog bootstrap-instance --output . --product-name "{{PRODUCT_NAME}}"
 
 ## Pendiente (no incluido por este comando)
 
-- Plantillas Tera y el tema `zola.386`: todavía se obtienen desde un checkout
-  del repositorio del motor (`make theme` / `scripts/bootstrap-theme.sh`).
-  Empaquetarlos en un release descargable del motor es trabajo de una fase
-  posterior.
-- Un workflow de CI para esta instancia (que descargue el binario del motor
-  por versión fijada) no se generó todavía: el motor aún no publica releases
-  binarios. Se agrega en cuanto exista ese release.
+- El tema `zola.386` es una dependencia externa de terceros (no de
+  clusterlog) y sigue obteniéndose por separado con `make theme` /
+  `scripts/bootstrap-theme.sh` — nunca se empaqueta dentro del motor.
+- Un workflow de CI listo para usar no se generó todavía. El motor sí
+  publica releases con binarios verificables por checksum
+  (github.com/fenandosr/clusterlog/releases); copie el `.gitea/workflows/ci.yml`
+  de una instancia existente como punto de partida.

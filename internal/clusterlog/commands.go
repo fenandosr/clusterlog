@@ -47,6 +47,8 @@ func (a *App) Run(args []string) error {
 		return a.runProject(root, args[1:])
 	case "content":
 		return a.runContent(root, args[1:])
+	case "templates":
+		return a.runTemplates(root, args[1:])
 	case "sync":
 		return a.runSync(root, args[1:])
 	case "validate":
@@ -78,6 +80,7 @@ Comandos:
   task create | start ID | stop ID | adjust ID | status ID | done ID | list
   project create | list
   content create
+  templates extract [--output DIR]
   sync [--check]
   validate
   verify commit [SHA]

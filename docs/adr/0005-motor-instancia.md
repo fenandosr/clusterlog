@@ -68,11 +68,10 @@ versión del motor que usa en su propio `.clusterlog-version`.
 
 ## Consecuencias negativas / limitaciones
 
-- **`templates/` y el tema siguen requiriendo un checkout o un tarball del
-  motor** (`clusterlog-templates_v0.1.0.tar.gz` en este release) —
-  `bootstrap-instance` no los empaqueta dentro de la instancia todavía; una
-  instancia real necesita `make theme`/`scripts/bootstrap-theme.sh` apuntando
-  a este repositorio o al tarball de plantillas del release.
+- ~~`templates/` y el tema siguen requiriendo un checkout o un tarball del
+  motor~~ — resuelto para `templates/` por ADR-0006 (quedan embebidas en el
+  binario); el tema (`zola.386`) sigue aparte a propósito, es una
+  dependencia externa de terceros, no código de clusterlog.
 - No existe todavía un workflow de CI de referencia para una instancia real
   que descargue el binario del motor por versión fijada — se agrega cuando
   el motor efectivamente publique releases en un remoto (este release, por
@@ -90,6 +89,11 @@ versión del motor que usa en su propio `.clusterlog-version`.
   (fase 3 del plan motor/instancia): un solo commit nuevo que retira los
   archivos de motor y agrega `.clusterlog-version`, sin reescribir historia
   existente.
-- Empaquetar `templates/` y el pin del tema dentro de lo que
-  `bootstrap-instance` deja listo para usar, para que una instancia nueva no
-  necesite un checkout separado del motor sólo para construir con Zola.
+- ~~Empaquetar `templates/`~~ — hecho, ver ADR-0006. El pin del tema sigue
+  siendo un checkout aparte, deliberadamente (ver ADR-0006, "Alternativas
+  descartadas").
+- Definir si una instancia puede sobreescribir una plantilla puntual del
+  motor sin forkear todo `templates/` — no hay una necesidad concreta
+  todavía; no construir esto especulativamente.
+- Definir cómo se entera una instancia de que hay una versión nueva del
+  motor (hoy: `.clusterlog-version` es manual, sin aviso ni automatización).

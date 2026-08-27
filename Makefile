@@ -25,32 +25,35 @@ e2e: build
 theme:
 	./scripts/bootstrap-theme.sh
 
+templates: build
+	./$(BINARY) --root . templates extract
+
 sync: build
 	./$(BINARY) --root . sync
 
 sync-check: build
 	./$(BINARY) --root . sync --check
 
-validate: build
+validate: theme templates
 	./$(BINARY) --root . validate --require-zola
 
 validate-local: build
 	./$(BINARY) --root . validate --skip-zola
 
-site: theme sync validate
+site: theme templates sync validate
 	$(ZOLA) build
 
-serve: theme sync
+serve: theme templates sync
 	$(ZOLA) serve --interface 127.0.0.1
 
 smoke: build
 	./scripts/smoke.sh
 
-ci: theme test vet e2e build sync sync-check validate
+ci: theme templates test vet e2e build sync sync-check validate
 	$(ZOLA) build
 
 clean:
-	rm -rf bin public themes/zola.386
+	rm -rf bin public templates themes/zola.386
 
 runme-install:
 	./scripts/runme-install.sh

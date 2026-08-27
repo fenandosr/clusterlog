@@ -159,6 +159,12 @@ func writeScaffold(root, productName, baseURL string) ([]string, error) {
 	}
 	created = append(created, versionPath)
 
+	templatesWritten, err := writeEmbeddedTemplates(filepath.Join(root, "templates"))
+	if err != nil {
+		return nil, err
+	}
+	created = append(created, templatesWritten...)
+
 	for _, dir := range []string{filepath.Join(root, "data", "review-events"), filepath.Join(root, "data", "task-events")} {
 		keep := filepath.Join(dir, ".gitkeep")
 		if err := writeFileAtomic(keep, []byte{}, 0o644); err != nil {

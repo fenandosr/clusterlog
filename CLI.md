@@ -398,10 +398,30 @@ No requiere `--root`: `--output` es un directorio nuevo, normalmente fuera del r
 - `data/admins.json` y `config/allowed_signers` vacíos (mismo formato que produce `admin add`, sin ningún administrador todavía);
 - `data/review-events/.gitkeep`, `data/task-events/.gitkeep`, `data/generated/`;
 - `.clusterlog-version` con la versión del binario que generó el scaffold;
+- `templates/` con las plantillas Tera del motor (embebidas en el binario, ver sección 18; no requiere red);
 - `README.md` y `.gitignore` de arranque.
 
 Falla con `output_not_empty` (código `5`) si `--output` ya existe y no está vacío — nunca sobreescribe una instancia existente. Con `--dry-run` no crea el directorio; sólo muestra qué haría.
 
 Después de `bootstrap-instance`, el flujo es el mismo que "Registrar al primer administrador" en `README.md`, apuntando `--root` al directorio nuevo: `admin add` → `sync` → `validate --skip-zola`. `validate` antes de la primera `sync` falla con `generated_state_stale` a propósito: la proyección todavía no existe.
 
-**No incluido todavía** (fases posteriores, ver el ADR de motor/instancia cuando exista): plantillas Tera ni tema empaquetados para descarga, ni un `.gitea/workflows/ci.yml` de instancia — el motor aún no publica releases binarios.
+**No incluido todavía**: el tema `zola.386` (dependencia externa de terceros, se obtiene aparte con `make theme`) y un `.gitea/workflows/ci.yml` de arranque para la instancia — el motor sí publica releases (github.com/fenandosr/clusterlog/releases), pero generar el workflow automáticamente queda para una fase posterior.
+
+## 18. Plantillas
+
+```bash
+clusterlog templates extract [--output DIR]
+```
+
+Escribe en `DIR` (por defecto `<root>/templates`) las plantillas Tera
+embebidas en el binario (`internal/clusterlog/scaffold/templates`, vía
+`go:embed`). No hace ninguna llamada de red: el binario y sus plantillas
+son siempre del mismo build, por construcción no pueden desincronizarse.
+`bootstrap-instance` ya las incluye automáticamente; use este comando
+aparte para refrescarlas en una instancia existente después de actualizar
+`.clusterlog-version` y descargar el binario nuevo.
+
+Antes de esto, las plantillas se distribuían como un tarball aparte en cada
+release (`clusterlog-templates_vX.Y.Z.tar.gz`); ese asset dejó de
+publicarse a partir de la versión que introduce este comando — quedan
+embebidas en el propio binario.
