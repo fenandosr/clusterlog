@@ -1,5 +1,6 @@
 /public/
 /bin/
+/dist/
 /themes/zola.386/
 .DS_Store
 *.tmp
