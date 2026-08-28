@@ -425,3 +425,33 @@ Antes de esto, las plantillas se distribuían como un tarball aparte en cada
 release (`clusterlog-templates_vX.Y.Z.tar.gz`); ese asset dejó de
 publicarse a partir de la versión que introduce este comando — quedan
 embebidas en el propio binario.
+
+## 19. Topología
+
+```bash
+clusterlog topology import --from-mksrv DIR [--output PATH] [--include-public-ip]
+```
+
+Lee `deployment.yaml` y `.mksrv/infra/outputs.json` (y `.mksrv/mesh.json`
+si existe) de un workspace de [mksrv](https://github.com/fenandosr/mksrv)
+y escribe `data/topology.json` (por defecto; ver `--output`) con un
+contrato genérico: hosts con rol (`edge` si el host lleva el stack `base`,
+`data` en caso contrario), proveedor, stacks, direcciones e
+identificadores de nube, más red y DNS a nivel de deployment. No ejecuta
+`terraform` ni `mksrv`, no hace red: sólo lee archivos que esas
+herramientas ya dejaron en disco. Ver `docs/adr/0007-topologia-importada-de-mksrv.md`.
+
+La IP pública de cada host es opt-in (`--include-public-ip`): igual que el
+motor nunca decide incluir datos reales por su cuenta, este comando
+tampoco decide por el operador si esa IP entra al contenido publicado.
+
+Un host presente en `deployment.yaml` pero todavía sin `terraform apply`
+(ausente de `outputs.json`) queda en la salida sin direcciones y con una
+advertencia, no con un error — no bloquea el resto del import. `--dry-run`
+muestra el contrato completo sin escribir el archivo.
+
+`--from-mksrv` es hoy el único adaptador soportado; el contrato de salida
+(`internal/clusterlog/topology.go`) no expone ningún tipo de mksrv fuera de
+ese archivo, a propósito, para que un adaptador futuro de otra herramienta
+produzca la misma forma. Este comando todavía no se integra con `sync`,
+`validate` ni ninguna plantilla Zola — ver "Trabajo futuro" del ADR-0007.
