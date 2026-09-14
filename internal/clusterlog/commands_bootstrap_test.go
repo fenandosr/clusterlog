@@ -1,6 +1,7 @@
 package clusterlog
 
 import (
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -141,6 +142,27 @@ func TestBootstrapInstanceDryRunWritesNothing(t *testing.T) {
 	}
 	if _, err := os.Stat(out); err == nil {
 		t.Fatal("--dry-run no debería haber creado el directorio de salida")
+	}
+}
+
+func TestBootstrapInstanceNextStepsDoNotEscapeAngleBrackets(t *testing.T) {
+	base := t.TempDir()
+	out := filepath.Join(base, "instancia-nueva")
+	var stdout bytes.Buffer
+	app := New(Options{JSON: true, Stdout: &stdout, Stderr: os.Stderr, Stdin: os.Stdin, Executable: "clusterlog"})
+
+	if err := app.runBootstrapInstance([]string{"--output", out}); err != nil {
+		t.Fatalf("runBootstrapInstance falló: %v", err)
+	}
+
+	printed := stdout.String()
+	escapedLT := string([]byte{'\\', 'u', '0', '0', '3', 'c'})
+	escapedGT := string([]byte{'\\', 'u', '0', '0', '3', 'e'})
+	if strings.Contains(printed, escapedLT) || strings.Contains(printed, escapedGT) {
+		t.Fatalf("la salida JSON escapó < y > en vez de dejarlos literales (encoding/json con SetEscapeHTML por defecto): %s", printed)
+	}
+	if !strings.Contains(printed, "<su-llave.pub>") {
+		t.Fatalf("se esperaba el placeholder <su-llave.pub> literal en next_steps: %s", printed)
 	}
 }
 

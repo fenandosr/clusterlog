@@ -1,6 +1,7 @@
 package clusterlog
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -305,17 +306,37 @@ type ResultEnvelope struct {
 	Warnings []string `json:"warnings,omitempty"`
 }
 
+// marshalIndentNoEscape serializa igual que json.MarshalIndent pero sin el
+// escape HTML por defecto de encoding/json (que convierte <, > y & en
+// <, > y &). La salida de la CLI es para terminal/agentes,
+// no para incrustar en HTML, así que ese escape sólo confunde cualquier
+// texto de ayuda o dato que contenga esos caracteres (por ejemplo, los
+// placeholders <id>/<correo> de bootstrap-instance).
+func marshalIndentNoEscape(v any) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(v); err != nil {
+		return nil, err
+	}
+	return bytes.TrimRight(buf.Bytes(), "\n"), nil
+}
+
 func (a *App) printResult(command string, data any, warnings ...string) error {
 	if a.Options.JSON {
-		enc := json.NewEncoder(a.Options.Stdout)
-		enc.SetIndent("", "  ")
-		return enc.Encode(ResultEnvelope{OK: true, Command: command, Data: data, Warnings: warnings})
+		bytes, err := marshalIndentNoEscape(ResultEnvelope{OK: true, Command: command, Data: data, Warnings: warnings})
+		if err != nil {
+			return err
+		}
+		fmt.Fprintln(a.Options.Stdout, string(bytes))
+		return nil
 	}
 	switch v := data.(type) {
 	case string:
 		fmt.Fprintln(a.Options.Stdout, v)
 	default:
-		bytes, err := json.MarshalIndent(v, "", "  ")
+		bytes, err := marshalIndentNoEscape(v)
 		if err != nil {
 			return err
 		}
@@ -339,13 +360,14 @@ func PrintError(w io.Writer, jsonMode bool, err error) int {
 			"details":   cliErr.Details,
 			"exit_code": cliErr.Code,
 		}}
-		enc := json.NewEncoder(w)
-		enc.SetIndent("", "  ")
-		_ = enc.Encode(payload)
+		bytes, err := marshalIndentNoEscape(payload)
+		if err == nil {
+			fmt.Fprintln(w, string(bytes))
+		}
 	} else {
 		fmt.Fprintf(w, "ERROR [%s]: %s\n", cliErr.Kind, cliErr.Message)
 		if cliErr.Details != nil {
-			bytes, _ := json.MarshalIndent(cliErr.Details, "", "  ")
+			bytes, _ := marshalIndentNoEscape(cliErr.Details)
 			fmt.Fprintln(w, string(bytes))
 		}
 	}
