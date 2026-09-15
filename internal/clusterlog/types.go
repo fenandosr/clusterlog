@@ -296,6 +296,12 @@ type SiteState struct {
 	RecentMemories []MemoryRecord    `json:"recent_memories"`
 	Tasks          []TaskState       `json:"tasks"`
 	Projects       []ProjectState    `json:"projects"`
+	// Topology es opcional: sólo las instancias que corrieron
+	// `clusterlog topology import` tienen data/topology.json. Se pliega tal
+	// cual (mismo contrato de topology.go) en vez de reproyectarse a un tipo
+	// propio de SiteState, porque ya es genérico y ya no expone nada de
+	// mksrv fuera de topology.go (ver ADR-0007).
+	Topology *Topology `json:"topology,omitempty"`
 }
 
 type ResultEnvelope struct {

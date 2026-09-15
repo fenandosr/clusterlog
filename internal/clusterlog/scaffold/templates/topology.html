@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ section.title }} · {{ config.title }}{% endblock title %}
+{% block description %}{{ section.description }}{% endblock description %}
+{% block content %}
+<header class="ops-page-header">
+  <p class="ops-eyebrow">INVENTARIO DE INFRAESTRUCTURA</p><h1>{{ section.title }}</h1><p>{{ section.description }}</p>
+  <div class="ops-prose">{{ section.content | safe }}</div>
+</header>
+
+{% if ops.topology %}
+<div class="ops-callout">
+  <strong>Fuente:</strong> {{ ops.topology.source }} · <strong>Generado por:</strong> <code>{{ ops.topology.generated_by }}</code>{% if ops.topology.env %} · <strong>Entorno:</strong> {{ ops.topology.env }}{% endif %}
+</div>
+
+<section aria-labelledby="topology-hosts-title">
+  <h2 id="topology-hosts-title">Hosts</h2>
+  {% set systems_taxonomy = get_taxonomy(kind="systems") %}
+  <div class="ops-board">
+  {% for host in ops.topology.hosts %}
+    <article class="ops-card">
+      <div class="ops-card__top"><code>{{ host.name }}</code>{% if host.role %}<span class="badge">{{ host.role }}</span>{% endif %}</div>
+      {# get_taxonomy_url errors when the term doesn't exist yet (no memoria
+         ni manual ha usado este nombre de host todavía en systems = [...]),
+         así que se busca a mano en los items ya cargados en vez de asumir
+         que el término existe. #}
+      {% set_global system_permalink = "" %}
+      {% for term in systems_taxonomy.items %}
+        {% if term.name == host.name %}{% set_global system_permalink = term.permalink %}{% endif %}
+      {% endfor %}
+      <h3>{% if system_permalink %}<a href="{{ system_permalink }}">{{ host.name }}</a>{% else %}{{ host.name }}{% endif %}</h3>
+      <dl>
+        {% if host.provider %}<dt>Proveedor</dt><dd>{{ host.provider }}</dd>{% endif %}
+        {% if host.instance_type %}<dt>Tipo</dt><dd>{{ host.instance_type }}</dd>{% endif %}
+        {% if host.instance_id %}<dt>Instancia</dt><dd>{{ host.instance_id }}</dd>{% endif %}
+        {% if host.az %}<dt>Zona</dt><dd>{{ host.az }}</dd>{% endif %}
+        {% if host.addresses.private %}<dt>Privada</dt><dd>{{ host.addresses.private }}</dd>{% endif %}
+        {% if host.addresses.management %}<dt>Gestión</dt><dd>{{ host.addresses.management }}</dd>{% endif %}
+        {% if host.addresses.mesh %}<dt>Malla</dt><dd>{{ host.addresses.mesh }}</dd>{% endif %}
+        {% if host.addresses.public %}<dt>Pública</dt><dd>{{ host.addresses.public }}</dd>{% endif %}
+      </dl>
+      {% if host.stacks %}<div class="ops-tags">{% for stack in host.stacks %}<span>#{{ stack }}</span>{% endfor %}</div>{% endif %}
+    </article>
+  {% endfor %}
+  {% if ops.topology.hosts | length == 0 %}<p class="ops-empty">No hay hosts en la topología importada.</p>{% endif %}
+  </div>
+</section>
+
+{% if ops.topology.network or ops.topology.dns %}
+<section aria-labelledby="topology-network-title">
+  <h2 id="topology-network-title">Red y DNS</h2>
+  <div class="ops-review-grid">
+    {% if ops.topology.network %}
+    <div>
+      <strong>Red</strong>
+      {% if ops.topology.network.vpc_id %}<span>VPC: {{ ops.topology.network.vpc_id }}</span>{% endif %}
+      {% if ops.topology.network.subnet_id %}<span>Subred: {{ ops.topology.network.subnet_id }}</span>{% endif %}
+      {% if ops.topology.network.availability_zone %}<span>Zona de disponibilidad: {{ ops.topology.network.availability_zone }}</span>{% endif %}
+    </div>
+    {% endif %}
+    {% if ops.topology.dns %}
+    <div>
+      <strong>DNS</strong>
+      {% if ops.topology.dns.root_domain %}<span>Dominio raíz: {{ ops.topology.dns.root_domain }}</span>{% endif %}
+      {% if ops.topology.dns.created %}<span>Registros creados: {{ ops.topology.dns.created | length }}</span>{% endif %}
+      {% if ops.topology.dns.pending %}<span class="ops-error">Pendientes: {{ ops.topology.dns.pending | join(sep=", ") }}</span>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% else %}
+<div class="ops-empty">
+  <strong>Sin topología importada todavía.</strong><br>
+  <pre><code>clusterlog topology import --from-mksrv DIR
+clusterlog sync</code></pre>
+</div>
+{% endif %}
+{% endblock content %}

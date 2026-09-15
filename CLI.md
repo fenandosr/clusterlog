@@ -453,5 +453,12 @@ muestra el contrato completo sin escribir el archivo.
 `--from-mksrv` es hoy el único adaptador soportado; el contrato de salida
 (`internal/clusterlog/topology.go`) no expone ningún tipo de mksrv fuera de
 ese archivo, a propósito, para que un adaptador futuro de otra herramienta
-produzca la misma forma. Este comando todavía no se integra con `sync`,
-`validate` ni ninguna plantilla Zola — ver "Trabajo futuro" del ADR-0007.
+produzca la misma forma.
+
+`clusterlog sync` pliega `data/topology.json` (si existe) a
+`data/generated/site_state.json`, y la sección "Topología" del sitio
+(`content/topologia/_index.md`, `templates/topology.html`) la consume en
+modo sólo lectura — mismo patrón que "Revisión": nada se autora a mano, sólo
+se genera y se sincroniza. Cada host enlaza a su término en la taxonomía
+`systems` cuando alguna memoria o manual ya lo menciona. Ver
+ADR-0007 (el comando de import) y ADR-0008 (la integración con Zola).

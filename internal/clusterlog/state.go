@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const siteStateVersion = 2
+const siteStateVersion = 3
 
 func loadReviewLog(root string) (ReviewLog, error) {
 	log := ReviewLog{Version: 1, Events: []ReviewEvent{}}
@@ -42,6 +42,25 @@ func loadTaskLog(root string) (TaskLog, error) {
 	}
 	sortTaskEvents(log.Events)
 	return log, nil
+}
+
+// loadTopology lee data/topology.json si existe. No todas las instancias
+// corren `clusterlog topology import` -- es opcional, así que un archivo
+// ausente no es un error, sólo una topología vacía en el sitio (ver
+// plantilla topology.html).
+func loadTopology(root string) (*Topology, string, error) {
+	path := filepath.Join(root, "data", "topology.json")
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return nil, "", nil
+		}
+		return nil, "", err
+	}
+	var topo Topology
+	if err := loadJSON(path, &topo); err != nil {
+		return nil, "", err
+	}
+	return &topo, path, nil
 }
 
 func requiredReviewers(registry AdminRegistry, policy, authorID string) []string {
@@ -96,12 +115,19 @@ func (a *App) BuildState(root string) (SiteState, error) {
 	if err != nil {
 		return SiteState{}, err
 	}
+	topology, topologyPath, err := loadTopology(root)
+	if err != nil {
+		return SiteState{}, err
+	}
 	sourcePaths := []string{filepath.Join(root, "data", "admins.json")}
 	sourcePaths = append(sourcePaths, reviewFiles...)
 	sourcePaths = append(sourcePaths, taskEventPaths...)
 	sourcePaths = append(sourcePaths, memoryFiles...)
 	sourcePaths = append(sourcePaths, taskFiles...)
 	sourcePaths = append(sourcePaths, projectFiles...)
+	if topologyPath != "" {
+		sourcePaths = append(sourcePaths, topologyPath)
+	}
 	digest, err := sourceDigest(sourcePaths)
 	if err != nil {
 		return SiteState{}, err
@@ -351,6 +377,7 @@ func (a *App) BuildState(root string) (SiteState, error) {
 		RecentMemories: recent,
 		Tasks:          taskStates,
 		Projects:       projects,
+		Topology:       topology,
 	}, nil
 }
 

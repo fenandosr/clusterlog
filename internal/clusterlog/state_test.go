@@ -160,6 +160,60 @@ Validar el respaldo.
 	}
 }
 
+// TestBuildStateFoldsTopology guards ADR-0008: data/topology.json is
+// optional (not every instance runs `topology import`), so BuildState must
+// leave SiteState.Topology nil without error when the file is absent, and
+// fold it in verbatim -- same contract as topology.go, no reprojection --
+// when present. It also must feed sourceDigest, so editing the file alone
+// (no content change) is enough to make `sync` regenerate.
+func TestBuildStateFoldsTopology(t *testing.T) {
+	root := testProjectRoot(t)
+	app := New(Options{Root: root, Now: func() time.Time { return time.Date(2026, 9, 15, 9, 0, 0, 0, time.UTC) }})
+
+	state, err := app.BuildState(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if state.Topology != nil {
+		t.Fatalf("expected nil Topology without data/topology.json, got %#v", state.Topology)
+	}
+
+	topoPath := filepath.Join(root, "data", "topology.json")
+	mustWriteTestFile(t, topoPath, `{
+  "version": 1,
+  "source": "mksrv",
+  "generated_by": "clusterlog topology import --from-mksrv",
+  "env": "prod",
+  "hosts": [
+    {"name": "edge", "role": "edge", "provider": "aws", "stacks": ["base"], "addresses": {"private": "10.0.0.1", "mesh": "100.64.0.1"}}
+  ],
+  "network": {"vpc_id": "vpc-1"},
+  "dns": {"root_domain": "example.org"}
+}`)
+	state, err = app.BuildState(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if state.Topology == nil || len(state.Topology.Hosts) != 1 || state.Topology.Hosts[0].Name != "edge" {
+		t.Fatalf("topology.json was not folded into SiteState: %#v", state.Topology)
+	}
+	firstDigest := state.SourceSHA256
+
+	if err := os.WriteFile(topoPath, []byte(`{"version":1,"source":"mksrv","generated_by":"x","hosts":[]}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	state, err = app.BuildState(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if state.SourceSHA256 == firstDigest {
+		t.Fatal("editing data/topology.json did not change the source digest")
+	}
+	if len(state.Topology.Hosts) != 0 {
+		t.Fatalf("expected empty hosts after rewrite, got %#v", state.Topology.Hosts)
+	}
+}
+
 func TestSyncRegeneratesWhenProjectionVersionChanges(t *testing.T) {
 	root := testProjectRoot(t)
 	app := New(Options{Root: root, Now: func() time.Time { return time.Date(2026, 8, 12, 15, 0, 0, 0, time.UTC) }})

@@ -80,9 +80,10 @@ haya una instancia real usándolo; ver "Trabajo futuro".
   `internal/model/model.go` de mksrv): si mksrv cambia la forma de esos
   campos concretos sin avisar, el import falla o produce datos incompletos.
   No hay ninguna prueba de contrato cruzada entre los dos repositorios hoy.
-- `data/topology.json` no se integra todavía con `sync`, `validate` ni
+- ~~`data/topology.json` no se integra todavía con `sync`, `validate` ni
   ninguna plantilla Zola — hoy es un archivo generado que nadie consume
-  todavía dentro de clusterlog.
+  todavía dentro de clusterlog.~~ Resuelto por ADR-0008: `sync` lo pliega a
+  `site_state.json` y la sección "Topología" lo consume.
 
 ## Alternativas descartadas
 
@@ -108,10 +109,8 @@ haya una instancia real usándolo; ver "Trabajo futuro".
 
 ## Trabajo futuro
 
-- Integrar `data/topology.json` con `clusterlog sync` (plegarlo a
-  `site_state.json`) y con una plantilla Zola nueva para una sección
-  "Topología", usando los nombres de host como valores de la taxonomía
-  `systems` para el cruce automático con memorias/manuales.
+- ~~Integrar `data/topology.json` con `clusterlog sync`... con una plantilla
+  Zola nueva para una sección "Topología"...~~ Ver ADR-0008.
 - Decidir si `clusterlog validate` debe advertir cuando `data/topology.json`
   existe pero está más viejo que `outputs.json` del workspace mksrv
   referenciado (haría falta guardar esa ruta en algún lado — hoy no se

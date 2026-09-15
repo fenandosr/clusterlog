@@ -13,7 +13,7 @@ var scaffoldFS embed.FS
 
 const scaffoldRoot = "scaffold"
 
-var scaffoldSections = []string{"documentacion", "manuales", "memorias", "proyectos", "tareas", "revision"}
+var scaffoldSections = []string{"documentacion", "manuales", "memorias", "proyectos", "tareas", "revision", "topologia"}
 
 // runBootstrapInstance genera el esqueleto de una instancia nueva de
 // clusterlog (content/, data/, config/, zola.toml) en --output. No toca el
