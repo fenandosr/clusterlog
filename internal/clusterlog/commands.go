@@ -49,6 +49,8 @@ func (a *App) Run(args []string) error {
 		return a.runContent(root, args[1:])
 	case "templates":
 		return a.runTemplates(root, args[1:])
+	case "static":
+		return a.runStatic(root, args[1:])
 	case "topology":
 		return a.runTopology(root, args[1:])
 	case "sync":
@@ -83,6 +85,7 @@ Comandos:
   project create | list
   content create
   templates extract [--output DIR]
+  static extract [--output DIR]
   topology import --from-mksrv DIR [--output PATH] [--include-public-ip]
   sync [--check]
   validate

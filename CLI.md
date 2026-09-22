@@ -394,11 +394,12 @@ clusterlog bootstrap-instance \
 No requiere `--root`: `--output` es un directorio nuevo, normalmente fuera del repositorio actual. Tampoco usa `--commit` (no hay nada que firmar todavía). Genera:
 
 - `zola.toml` con `base_url`/`title`/`[extra] product_name` sustituidos y el resto de los valores genéricos del motor;
-- `content/<sección>/_index.md` para `documentacion`, `manuales`, `memorias`, `proyectos`, `tareas` y `revision`;
+- `content/<sección>/_index.md` para `documentacion`, `manuales`, `memorias`, `proyectos`, `tareas`, `revision` y `topologia`;
 - `data/admins.json` y `config/allowed_signers` vacíos (mismo formato que produce `admin add`, sin ningún administrador todavía);
 - `data/review-events/.gitkeep`, `data/task-events/.gitkeep`, `data/generated/`;
 - `.clusterlog-version` con la versión del binario que generó el scaffold;
 - `templates/` con las plantillas Tera del motor (embebidas en el binario, ver sección 18; no requiere red);
+- `static/` con el CSS/JS/fuente del diseño (embebidos en el binario, ver sección 20; no requiere red);
 - `README.md` y `.gitignore` de arranque.
 
 Falla con `output_not_empty` (código `5`) si `--output` ya existe y no está vacío — nunca sobreescribe una instancia existente. Con `--dry-run` no crea el directorio; sólo muestra qué haría.
@@ -462,3 +463,22 @@ modo sólo lectura — mismo patrón que "Revisión": nada se autora a mano, só
 se genera y se sincroniza. Cada host enlaza a su término en la taxonomía
 `systems` cuando alguna memoria o manual ya lo menciona. Ver
 ADR-0007 (el comando de import) y ADR-0008 (la integración con Zola).
+
+## 20. Assets estáticos
+
+```bash
+clusterlog static extract [--output DIR]
+```
+
+Escribe en `DIR` (por defecto `<root>/static`) los assets estáticos
+embebidos en el binario (`internal/clusterlog/scaffold/static`, vía
+`go:embed`): `css/ops.css` (el diseño real de las plantillas — el tema
+`zola.386` sólo aporta un reset mínimo, ver `scripts/bootstrap-theme.sh`),
+`js/ops-search.js` (búsqueda del lado del cliente contra
+`search_index.<idioma>.json`, que genera Zola solo), la fuente
+`fonts/ShareTechMono-Regular.woff2` y `robots.txt`. Mismo principio que
+`templates extract` (ADR-0006): sin red, sin desincronización posible entre
+binario y assets. `bootstrap-instance` ya lo incluye automáticamente; use
+este comando aparte para refrescarlos en una instancia existente después de
+actualizar `.clusterlog-version` y descargar el binario nuevo. Ver
+ADR-0009.

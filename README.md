@@ -63,7 +63,7 @@ Este repositorio es el **motor**: la CLI, las plantillas y el mecanismo de tema,
 clusterlog bootstrap-instance --output ./mi-deploy --product-name "Mi Bitácora"
 ```
 
-Genera `zola.toml`, las seis secciones de `content/` vacías, `data/admins.json`/`config/allowed_signers` vacíos, `templates/` (embebidas en el binario, sin red) y `.clusterlog-version`. Ver la sección 17 de [`CLI.md`](CLI.md) para el detalle completo; el tema (`zola.386`, dependencia externa) y un `.gitea/workflows/ci.yml` de arranque siguen siendo pasos aparte.
+Genera `zola.toml`, las siete secciones de `content/` vacías, `data/admins.json`/`config/allowed_signers` vacíos, `templates/` y `static/` (ambos embebidos en el binario, sin red) y `.clusterlog-version`. Ver la sección 17 de [`CLI.md`](CLI.md) para el detalle completo; el tema (`zola.386`, dependencia externa) y un `.gitea/workflows/ci.yml` de arranque siguen siendo pasos aparte.
 
 ## Registrar al primer administrador
 
